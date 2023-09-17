@@ -1,17 +1,35 @@
+import java.util.Scanner;
+
 public class SharedObject {
-    private int score; // 값이 비어 있으면 Receiver객체는 기다림, 채워져 있으면 Sender는 기다림
-    private int[] value;
+    // 값이 비어 있으면 Receiver객체는 기다림, 채워져 있으면 Sender는 기다림
+    private int value;
+    Scanner sc = new Scanner(System.in);
+    private int SIZE;
     private boolean ValueFlag = false;
-
-    SharedObject(){
-        this.score = 0;
-        this.value = new int[10];
-
+    public SharedObject(){
+        this.SIZE = 10;
     }
-    public int take(){
-        return 0;
+    public synchronized int take() throws InterruptedException {
+        while (!ValueFlag){
+            wait();
+        }
+        ValueFlag = false;
+        notifyAll();
+        return value;
     }
-    public void put(int value){
-        this.score += value;
+    public synchronized void put(int val) throws InterruptedException {
+        while (ValueFlag){
+            wait();
+        }
+        value = val;
+        System.out.println("MESSAGE RECEIVED : " + value);
+        ValueFlag = true;
+        notifyAll();
+    }
+    public synchronized int getSize(){
+        return this.SIZE;
+    }
+    public synchronized void setSize(int size){
+        this.SIZE = size;
     }
 }
